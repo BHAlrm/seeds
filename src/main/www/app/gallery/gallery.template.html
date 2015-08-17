@@ -1,0 +1,55 @@
+<div class="gallery">
+    <div class="page-title">
+        <h1 ng-bind="vm.gallery.imagegallery_name"></h1>
+    </div>
+
+    <div class="form-group">
+        <input type="text" name="search" class="form-control" ng-model="vm.search.image_name" placeholder="search"/>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-xs-2">
+            <button class="btn btn-block btn-danger" ng-click="vm.create()">Create</button>
+        </div>
+
+        <div class="col-xs-4 col-xs-offset-6">
+            <select ng-model="vm.sortBy" class="form-control">
+                <option value="none">sort by</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="btn-group" role="group" aria-label="select">
+            <button type="button" class="btn btn-default" ng-click="vm.selectAll()">Select All</button>
+            <button type="button" class="btn btn-default" ng-click="vm.clearAll()">Clear All</button>
+        </div>
+
+        <button type="button" class="btn btn-default pull-right" ng-click="vm.delete()">Delete Multiple</button>
+    </div>
+
+    <div class="list-group">
+        <div class="list-group-item" ng-repeat="image in vm.imageList | filter:vm.search">
+            <div class="row">
+                <div class="checkbox col-xs-1">
+                    <label>
+                        <input type="checkbox" ng-model="image.selected">
+                    </label>
+                </div>
+                <div class="col-xs-11">
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="" ng-click="vm.openImage(image)">
+                                <img class="media-object" ng-src={{image.image_url}} width="64" height="64"> </a>
+                        </div>
+                        <div class="media-body">
+                            {{ image | json }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
