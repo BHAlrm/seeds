@@ -1,0 +1,36 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typing",
+  "bundle": "typing/tsd.d.ts",
+  "installed": {
+    "angularjs/angular-mocks.d.ts": {
+      "commit": "7ccb1759f9f36352e10ee019934d811aee60d4fe"
+    },
+    "angularjs/angular-sanitize.d.ts": {
+      "commit": "7ccb1759f9f36352e10ee019934d811aee60d4fe"
+    },
+    "angularjs/angular-animate.d.ts": {
+      "commit": "7ccb1759f9f36352e10ee019934d811aee60d4fe"
+    },
+    "angularjs/angular-route.d.ts": {
+      "commit": "7ccb1759f9f36352e10ee019934d811aee60d4fe"
+    },
+    "angularjs/angular.d.ts": {
+      "commit": "7ccb1759f9f36352e10ee019934d811aee60d4fe"
+    },
+    "jquery/jquery.d.ts": {
+      "commit": "3b7d4abb1c74664c3b844f23b3f6dfb8bada6809"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "3b0f362204ea965952dafdb682a5274d527ef9d0"
+    },
+    "angular-ui-bootstrap/angular-ui-bootstrap.d.ts": {
+      "commit": "3b0f362204ea965952dafdb682a5274d527ef9d0"
+    },
+    "angular-file-upload/angular-file-upload.d.ts": {
+      "commit": "da995655d8f810e5e860d908bf5422ee59ef8ab6"
+    }
+  }
+}

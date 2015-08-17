@@ -1,0 +1,19 @@
+<div class="modal-body">
+    <div class="text-center">
+        <div class="btn-group-vertical" role="group" aria-label="...">
+            <div class="btn btn-default" ngf-select ng-model="dialog.image.image_file" ngf-change="dialog.upload($files, $file, $event, $rejectedFiles)" ngf-multiple="false" accept="image/*">
+                Select File
+            </div>
+            <button class="btn btn-default" ng-click="dialog.editImage();" ng-disabled="!dialog.image.image_file">
+                Edit Image
+            </button>
+
+            <button class="btn btn-default" ng-click="dialog.selectFormGallery();">
+                Select from gallery
+            </button>
+        </div>
+        
+        
+    </div>
+
+</div>

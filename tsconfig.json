@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "noExternalResolve": false,
+    "module": "AMD",
+    "removeComments": true,
+    "noImplicitAny": true,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "noResolved": true,
+    "declarationFiles": true
+  }
+}
