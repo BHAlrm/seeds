@@ -4,6 +4,6 @@
 
 module richstudio{
     
-    angular.module('richstudio.core', ['ui.bootstrap' , 'ngFileUpload', 'ngImgCrop']);
+    angular.module('richstudio.core', ['ui.bootstrap' , 'ngFileUpload']);
     
 }

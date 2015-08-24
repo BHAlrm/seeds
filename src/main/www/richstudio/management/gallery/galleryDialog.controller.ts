@@ -9,17 +9,20 @@ module richstudio {
 
 
     class GalleryDialogController {
-        static $inject:string[] = ['RichStudioDataService', 'galleryId'];
+        static $inject:string[] = ['RichStudioDataService', 'galleryId', 'management'];
 
         private curPage:number;
         private perPage:number;
         private sortBy:string;
+        private showSelected:boolean = false;
 
         private imageList:IImage[];
         private gallery:richstudio.IGallery;
 
 
-        constructor(private dataService:richstudio.RichStudioDataService, private galleryId:string, private management:ManagementService) {
+        constructor(private dataService:richstudio.RichStudioDataService,
+                    private galleryId:string,
+                    private management:richstudio.ManagementService) {
             this.activate();
         }
 
@@ -39,8 +42,7 @@ module richstudio {
         }
 
         private getImageList() {
-
-            return this.dataService.getImageList(1, 10).then((list:richstudio.IList<richstudio.IImage>) => {
+            return this.dataService.getImageList(this.gallery.imagegallery_id, 1, 10).then((list:richstudio.IList<richstudio.IImage>) => {
                 return list.dataList
             });
         }
@@ -48,11 +50,6 @@ module richstudio {
         private getGallery() {
             return this.dataService.getGalleryByID(this.galleryId);
         }
-
-        private openImage(image:IImage) {
-            //this.management.openViewDialog(image);
-        }
-
 
         public clearAll() {
             this.setSelect(false);
@@ -62,9 +59,25 @@ module richstudio {
             this.setSelect(true);
         }
 
+        public showImage(imageId:string) {
+            //this.imageService.mapImageToEditedImage(image);
+            this.management.openViewDialog(this.gallery.imagegallery_id, imageId);
+        }
+
+        public select() {
+            this.showSelected = true;
+        }
+
         private setSelect(isSelectAll:boolean) {
             _.each(this.imageList, (image:IImage)=> {
                 image.selected = isSelectAll
+            });
+        }
+
+        private delete() {
+            var deletedImageIds = _.pluck(_.where(this.imageList, {selected: true}), 'image_id');
+            return this.dataService.deleteImages(deletedImageIds).then((response:ng.IHttpPromise<richstudio.IResponse<richstudio.IDeletedData>>) => {
+                this.imageList = _.filter(this.imageList, (image:IImage)=>(!image.selected));
             });
         }
 

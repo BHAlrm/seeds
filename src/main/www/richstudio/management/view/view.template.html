@@ -1,33 +1,30 @@
 <div class="modal-header">
-    <h3 class="modal-title">I'm a modal!</h3>
+    <h3 class="modal-title">View dialog</h3>
 </div>
 <div class="modal-body">
     <div class="text-center">
 
         <div class="image-tool">
-            <div class="image-tool-rotate" ng-show="dialog.isRotate" style="position: absolute;
+            <div style="position: absolute;
     width: 100%;
     top: 0;
     right: 0;
     padding: 20PX;">
-                <button class="btn btn-default pull-left" ng-click="dialog.rotating(-90);">rotate left</button>
-                <button class="btn btn-default  pull-right" ng-click="dialog.rotating(90);">rotate right</button>
+                <button class="btn btn-default pull-left" ng-click="dialog.showPreviousImage();">Previous</button>
+                <button class="btn btn-default  pull-right" ng-click="dialog.showNextImage();">Next</button>
             </div>
             <div style="width: 288px; height: 288px; margin: auto; display: table; overflow: visible;">
-                <img width="128" rotate="dialog.image.txt_rotate_degree" ng-src="{{dialog.image.image_file}}"
-                     ng-hide="dialog.isCrop">
-                <img-crop image="dialog.image.image_file" result-image="dialog.resultImage"
-                          ng-show="dialog.isCrop"></img-crop>
+                <img width="128" ng-src="{{dialog.imageList[dialog.displayedImageNumber].image_url}}">
             </div>
+            <h4>{{dialog.imageList[dialog.displayedImageNumber].image_title}}</h4>
         </div>
         <button class="btn btn-default" type="button" ng-click="dialog.rename()">rename</button>
         <button class="btn btn-default" type="button" ng-click="dialog.crop()">crop</button>
         <button class="btn btn-default" type="button" ng-click="dialog.rotate()">rotate</button>
         <button class="btn btn-default" type="button" ng-click="dialog.delete()">delete</button>
     </div>
-
+   
 </div>
 <div class="modal-footer text-center">
-    <button class="btn btn-primary" type="button" ng-click="dialog.resolve()">Select</button>
-    <button class="btn btn-default" type="button" ng-click="dialog.dismiss()">Cancel</button>
+    <button class="btn btn-default" type="button" ng-click="dialog.dismiss()">Close</button>
 </div>

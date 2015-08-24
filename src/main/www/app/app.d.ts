@@ -13,6 +13,14 @@ declare module app {
 declare module app {
 }
 
+declare module app {
+}
+
+declare module app {
+}
+
+declare module app {
+}
 
 declare module app {
 }

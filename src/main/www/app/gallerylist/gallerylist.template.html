@@ -1,10 +1,10 @@
-<div class="gallery">
+<div class="gallerylist">
     <div class="page-title">
-        <h1 ng-bind="vm.gallery.imagegallery_name"></h1>
+        <h1>Gallery list</h1>
     </div>
-
+    
     <div class="form-group">
-        <input type="text" name="search" class="form-control" ng-model="vm.search.image_name" placeholder="search"/>
+        <input type="text" name="search" class="form-control" ng-model="vm.search.imagegallery_name" placeholder="search"/>
     </div>
 
     <div class="form-group row">
@@ -29,23 +29,21 @@
     </div>
 
     <div class="list-group">
-        <div class="list-group-item" ng-repeat="image in vm.imageList | filter:vm.search">
+        <div class="list-group-item" ng-repeat="gallery in vm.galleryList | filter:vm.search">
             <div class="row">
                 <div class="checkbox col-xs-1">
                     <label>
-                        <input type="checkbox" ng-model="image.selected">
+                        <input type="checkbox" ng-model="gallery.selected">
                     </label>
                 </div>
                 <div class="col-xs-11">
-                    <div class="media">
-                        <div class="media-left" ng-click="vm.showImage(image.image_id)">
-                            <a href="">
-                                <img class="media-object" ng-src={{image.image_url}} width="64" height="64"> </a>
-                        </div>
-                        <div class="media-body">
-                            {{ image | json }}
-                        </div>
-                    </div>
+                    <p>
+                        <a href="" ng-click="vm.openGallery(gallery.imagegallery_id)">#{{ gallery.imagegallery_id }}</a>
+                        <b>{{ gallery.imagegallery_title }}</b>
+                        <span>{{ gallery.imagegallery_name }}</span>
+                    </p>
+
+                    <small>{{ gallery.imagegallery_create_time }}</small>
                 </div>
             </div>
 
@@ -55,7 +53,8 @@
     <div class="form-group">
         <button type="button" class="btn btn-default" ng-click="vm.select()">Select</button>
     </div>
-
-    <p ng-show="vm.showSelected" ng-bind="vm.imageList | filter:{selected:true} | json"></p>
-
+    
+    <p ng-show="vm.showSelected" ng-bind="vm.galleryList | filter:{selected:true} | json"></p>
 </div>
+
+

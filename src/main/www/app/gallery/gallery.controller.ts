@@ -1,75 +1,88 @@
-///**
-// * Created by BHAlrM on 8/9/2015 AD.
-// */
-//module app {
-//
-//    interface IImage extends app.core.IImage {
-//        selected?: boolean;
-//    }
-//
-//
-//    class GalleryController {
-//        static $inject:string[] = ['DataService', '$routeParams', 'imgManagement'];
-//
-//        private curPage:number;
-//        private perPage:number;
-//        private sortBy:string;
-//
-//        private imageList:IImage[];
-//        private gallery:app.core.IGallery;
-//
-//
-//        constructor(private dataService:app.core.DataService, private $routeParams:ng.route.IRouteParamsService, private imgManagement:app.components.IImgManagementService) {
-//            this.activate();
-//        }
-//
-//        private activate() {
-//
-//            this.getGallery()
-//                .then((gallery:app.core.IGallery)=> {
-//                    this.gallery = gallery;
-//                })
-//                .then(()=> {
-//                    this.getImageList()
-//                        .then((imageList:app.core.IImage[])=> {
-//                            this.imageList = imageList;
-//                        });
-//                });
-//
-//        }
-//
-//        private getImageList() {
-//
-//            return this.dataService.getImageList(1, 10).then((list:app.core.IList<app.core.IImage>) => {
-//                return list.dataList
-//            });
-//        }
-//
-//        private getGallery() {
-//            var galleryId = this.$routeParams["id"];
-//
-//            return this.dataService.getGalleryByID(galleryId);
-//        }
-//
-//        private openImage(image:IImage) {
-//            this.imgManagement.openViewDialog(image);
-//        }
-//
-//
-//        public clearAll() {
-//            this.setSelect(false);
-//        }
-//
-//        public selectAll() {
-//            this.setSelect(true);
-//        }
-//
-//        private setSelect(isSelectAll:boolean) {
-//            _.each(this.imageList, (image:IImage)=> {
-//                image.selected = isSelectAll
-//            });
-//        }
-//
-//    }
-//    angular.module('app').controller('GalleryController', GalleryController);
-//}
+/**
+ * Created by BHAlrM on 8/9/2015 AD.
+ */
+module app {
+
+    interface IImage extends richstudio.IImage {
+        selected?: boolean;
+    }
+
+
+    class GalleryController {
+        static $inject:string[] = ['RichStudioDataService', '$routeParams', 'management'];
+
+        private curPage:number;
+        private perPage:number;
+        private sortBy:string;
+        private showSelected:boolean = false;
+
+        private imageList:IImage[];
+        private gallery:richstudio.IGallery;
+
+
+        constructor(private dataService:richstudio.RichStudioDataService,
+                    private $routeParams:ng.route.IRouteParamsService,
+                    private management:richstudio.ManagementService) {
+            this.activate();
+        }
+
+        private activate() {
+
+            this.getGallery()
+                .then((gallery:richstudio.IGallery)=> {
+                    this.gallery = gallery;
+                })
+                .then(()=> {
+                    this.getImageList()
+                        .then((imageList:richstudio.IImage[])=> {
+                            this.imageList = imageList;
+                        });
+                });
+
+        }
+
+        private getImageList() {
+            return this.dataService.getImageList(this.gallery.imagegallery_id, 1, 10).then((list:richstudio.IList<richstudio.IImage>) => {
+                return list.dataList
+            });
+        }
+
+        private getGallery() {
+            var galleryId = this.$routeParams["id"];
+
+            return this.dataService.getGalleryByID(galleryId);
+        }
+
+        public clearAll() {
+            this.setSelect(false);
+        }
+
+        public selectAll() {
+            this.setSelect(true);
+        }
+
+        public showImage(imageId:string) {
+            //this.imageService.mapImageToEditedImage(image);
+            this.management.openViewDialog(this.gallery.imagegallery_id, imageId);
+        }
+
+        public select() {
+            this.showSelected = true;
+        }
+
+        private setSelect(isSelectAll:boolean) {
+            _.each(this.imageList, (image:IImage)=> {
+                image.selected = isSelectAll
+            });
+        }
+
+        private delete() {
+            var deletedImageIds = _.pluck(_.where(this.imageList, {selected: true}), 'image_id');
+            return this.dataService.deleteImages(deletedImageIds).then((response:ng.IHttpPromise<richstudio.IResponse<richstudio.IDeletedData>>) => {
+                this.imageList = _.filter(this.imageList, (image:IImage)=>(!image.selected));
+            });
+        }
+
+    }
+    angular.module('app').controller('GalleryController', GalleryController);
+}

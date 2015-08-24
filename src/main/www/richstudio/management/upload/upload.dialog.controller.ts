@@ -6,12 +6,19 @@ module richstudio {
     export interface IUploadDialogScope extends ng.IScope {
         fileChange():void;
     }
-
+    
+    export interface IImage{
+        file?:File
+    }
+    
     export class UploadDialogController {
-        static $inject:string[] = ['$modalInstance', '$scope', 'image'];
+        
+        static $inject:string[] = ['$modalInstance', '$scope', 'management', 'image'];
+        
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
                     private $scope:IUploadDialogScope,
-                    private image:IEditedImage) {
+                    private management:ManagementService,
+                    private image:IImage) {
             this.activate();
         }
 
@@ -20,21 +27,34 @@ module richstudio {
 
         }
 
-        public upload($files:File[], $file:File, $event:Event, $rejectedFiles:File) {
-            if(!$file) return;
+        public upload($files:File[], $file:File) {
+            if($files.length === 0) return;
+
+            this.$modalInstance.close($files);
+
+            //var fr = new FileReader();
+            //angular.forEach($files, (file:File)=>{
+            //    fr.readAsDataURL(file);
+            //});
+            //
+            //fr.onload = (e:Event)=> {
+            //    this.$scope.$apply(() => {
+            //        var fileReader = <FileReader>e.target;
+            //        
+            //        if(this.image){
+            //            this.image.image_url = fileReader.result;
+            //            this.image.file = $file[0];
+            //        }else{
+            //            
+            //        }
+            //      
+            //    });
+            //};
             
-            var fr = new FileReader();
-            fr.onload = (e:any)=> {
-                this.$scope.$apply(() => {
-                    this.image.image_file = e.target.result;
-                });
-            };
-            
-            fr.readAsDataURL(this.image.image_file);
         }
 
         public editImage() {
-            this.$modalInstance.close({action: eUploadAction.EDIT, image:this.image});
+            this.management.openViewDialogWithImage(this.image);
         }
 
         public selectFormGallery() {

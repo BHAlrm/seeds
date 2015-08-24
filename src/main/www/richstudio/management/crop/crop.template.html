@@ -1,0 +1,44 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{dialog.image.image_title}}</h3>
+</div>
+<div class="modal-body">
+    <div class="text-center">
+
+        <div class="image-tool">
+            <div class="image-tool-rotate" ng-show="dialog.isRotate" style="position: absolute;
+    width: 100%;
+    top: 0;
+    right: 0;
+    padding: 20PX;">
+                <button class="btn btn-default pull-left" ng-click="dialog.rotating(-90);">rotate left</button>
+                <button class="btn btn-default  pull-right" ng-click="dialog.rotating(90);">rotate right</button>
+            </div>
+            <div style="width: 288px; height: 288px; margin: auto; display: table; overflow: visible;">
+                <div image-crop
+                     img-src="dialog.image.image_url"
+                     scaled-height="dialog.cropRect.ch"
+                     scaled-width="dialog.cropRect.cw"
+                     scaled-top="dialog.cropRect.cy"
+                     scaled-left="dialog.cropRect.cx"
+                     original-image-width="dialog.cropRect.width"
+                     original-image-height="dialog.cropRect.height">
+                </div>
+
+                {{"Original Width: " + dialog.cropRect.cw+"px"}}<br/>
+                {{"Original Height: " + dialog.cropRect.ch+"px"}}<br/>
+                
+                {{"Original X: " + dialog.cropRect.cx + "px"}}<br/>
+                {{"Original Y: " + dialog.cropRect.cy + "px"}}<br/>
+                
+                {{"img width: " + dialog.cropRect.width + "px"}}<br/>
+                {{"img Height: " + dialog.cropRect.height + "px"}}<br/>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<div class="modal-footer text-center">
+    <button class="btn btn-primary" type="button" ng-click="dialog.resolve()">Save</button>
+    <button class="btn btn-default" type="button" ng-click="dialog.dismiss()">Cancel</button>
+</div>
