@@ -22,7 +22,12 @@ module app {
         }
 
         public openImgUploadDialog() {
-            this.management.openUploadDialog(this.image)
+            var uploadDialogRequest:richstudio.IUploadDialogRequest = {
+                isMultiFileSelection: false,
+                operatedImage: this.image
+            };
+            
+            this.management.openUploadDialog(uploadDialogRequest)
                 .then((files:File[])=>{
                     var fr = new FileReader();
                     fr.readAsDataURL(files[0]);

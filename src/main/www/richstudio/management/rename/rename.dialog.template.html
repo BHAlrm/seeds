@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h3 class="modal-title">{{dialog.image.image_title}}</h3>
+    <h3 class="modal-title">{{dialog.operatedImage.image_title}}</h3>
 </div>
 <div class="modal-body">
     <div class="text-center">
@@ -7,11 +7,13 @@
         <div class="image-tool">
            
             <div style="width: 288px; height: 288px; margin: auto; display: table; overflow: visible;">
-                <img rotate="dialog.rotateDegrees" width="128" ng-src="{{dialog.image.image_url}}">
+                <img width="128" ng-src="{{dialog.operatedImage.image_url}}">
             </div>
         </div>
-        <button class="btn btn-default" type="button" ng-click="dialog.rotate(-90)">Left</button>
-        <button class="btn btn-default" type="button" ng-click="dialog.rotate(90)">Right</button>
+        
+        <div class="form-group">
+            <input type="text" class="form-control" ng-model="dialog.name">
+        </div>
     </div>
    
 </div>
@@ -19,4 +21,3 @@
     <button class="btn btn-default" type="button" ng-click="dialog.resolve()">Save</button>
     <button class="btn btn-default" type="button" ng-click="dialog.dismiss()">Cancel</button>
 </div>
-

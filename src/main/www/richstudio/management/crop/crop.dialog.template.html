@@ -1,5 +1,5 @@
 <div class="modal-header">
-    <h3 class="modal-title">{{dialog.image.image_title}}</h3>
+    <h3 class="modal-title">{{dialog.operatedImage.image_title}}</h3>
 </div>
 <div class="modal-body">
     <div class="text-center">
@@ -15,7 +15,8 @@
             </div>
             <div style="width: 288px; height: 288px; margin: auto; display: table; overflow: visible;">
                 <div image-crop
-                     img-src="dialog.image.image_url"
+                     aspect-ratio="'1:1'"
+                     img-src="dialog.operatedImage.image_url"
                      scaled-height="dialog.cropRect.ch"
                      scaled-width="dialog.cropRect.cw"
                      scaled-top="dialog.cropRect.cy"

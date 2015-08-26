@@ -410,7 +410,7 @@ module richstudio {
 
         private activate() {
             if (this.$scope.aspectRatio) {
-                this.ratioValues = this.$scope.aspectRatio.split("/");
+                this.ratioValues = this.$scope.aspectRatio.split(":");
                 this.aspectRatioX = parseFloat(this.ratioValues[0]);
                 this.aspectRatioY = parseFloat(this.ratioValues[1]);
             }

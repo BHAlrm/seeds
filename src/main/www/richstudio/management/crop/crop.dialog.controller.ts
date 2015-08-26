@@ -13,12 +13,19 @@ module richstudio {
     }
     
     class CropImageDialogController {
-        static $inject:string[] = ['$modalInstance', 'image'];
-        
+        static $inject:string[] = ['$modalInstance', 'request'];
+
+        private operatedImage:IImage;
+        private imageList:IImage[];
         cropRect:ICropRect;
 
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
-                    private image:IImage) {
+                    private request:IImageManagementDialogRequest) {
+            this.activate();
+        }
+
+        public activate() {
+            angular.extend(this, this.request);
         }
 
         public resolve() {

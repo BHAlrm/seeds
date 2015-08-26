@@ -38,9 +38,9 @@
                 </div>
                 <div class="col-xs-11">
                     <div class="media">
-                        <div class="media-left" ng-click="vm.showImage(image.image_id)">
+                        <div class="media-left" ng-click="vm.showImage(image)">
                             <a href="">
-                                <img class="media-object" ng-src={{image.image_url}} width="64" height="64"> </a>
+                                <img class="media-object" ng-src={{vm.getRectUrl(image);}} width="100" height="100"> </a>
                         </div>
                         <div class="media-body">
                             {{ image | json }}

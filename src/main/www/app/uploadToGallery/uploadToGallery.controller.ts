@@ -21,7 +21,11 @@ module app {
 
 
         public openImgUploadDialog() {
-            this.management.openUploadDialog()
+            var uploadDialogRequest:richstudio.IUploadDialogRequest = {
+                isMultiFileSelection: true
+            };
+            
+            this.management.openUploadDialog(uploadDialogRequest)
                 .then((files:File[])=>{
                     this.images = [];
                     _.each(files, (file:File)=>{

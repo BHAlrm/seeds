@@ -3,7 +3,7 @@
  */
 module richstudio {
 
-    export interface IImage{
+    export interface IImage {
         selected?: boolean;
     }
 
@@ -59,9 +59,13 @@ module richstudio {
             this.setSelect(true);
         }
 
-        public showImage(imageId:string) {
-            //this.imageService.mapImageToEditedImage(image);
-            this.management.openViewDialog(this.gallery.imagegallery_id, imageId);
+        public showImage(image:IImage) {
+            var viewDialogRequest:IViewDialogRequest = {
+                operatedImage: image,
+                imageList: this.imageList
+            };
+
+            this.management.openViewDialog(viewDialogRequest);
         }
 
         public select() {
@@ -75,9 +79,19 @@ module richstudio {
         }
 
         private delete() {
-            var deletedImageIds = _.pluck(_.where(this.imageList, {selected: true}), 'image_id');
-            return this.dataService.deleteImages(deletedImageIds).then((response:ng.IHttpPromise<richstudio.IResponse<richstudio.IDeletedData>>) => {
-                this.imageList = _.filter(this.imageList, (image:IImage)=>(!image.selected));
+            var deletedImageIds = _.map(this.imageList, (image:richstudio.IImage)=> {
+                if (image.selected) return {image_id: image.image_id};
+            });
+
+            var deleteImageRequest:richstudio.IDeleteImageRequest = {
+                txt_delete_json: angular.toJson(deletedImageIds)
+            };
+
+            return this.dataService.deleteImages(deleteImageRequest).then(() => {
+                this.getImageList()
+                    .then((imageList:richstudio.IImage[])=> {
+                        this.imageList = imageList;
+                    });
             });
         }
 

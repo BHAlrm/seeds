@@ -61,13 +61,22 @@ module app {
             this.setSelect(true);
         }
 
-        public showImage(imageId:string) {
-            //this.imageService.mapImageToEditedImage(image);
-            this.management.openViewDialog(this.gallery.imagegallery_id, imageId);
+        public showImage(image:richstudio.IImage) {
+            var viewDialogRequest:richstudio.IViewDialogRequest = {
+                operatedImage: image,
+                imageList: this.imageList
+            };
+
+            this.management.openViewDialog(viewDialogRequest);
         }
 
         public select() {
             this.showSelected = true;
+        }
+
+        public getRectUrl(image:richstudio.IImage):string {
+            var url = image.image_url.replace(image.image_file_name, 'r100_' + image.image_file_name);
+            return url;
         }
 
         private setSelect(isSelectAll:boolean) {
@@ -77,9 +86,19 @@ module app {
         }
 
         private delete() {
-            var deletedImageIds = _.pluck(_.where(this.imageList, {selected: true}), 'image_id');
-            return this.dataService.deleteImages(deletedImageIds).then((response:ng.IHttpPromise<richstudio.IResponse<richstudio.IDeletedData>>) => {
-                this.imageList = _.filter(this.imageList, (image:IImage)=>(!image.selected));
+            var deletedImageIds = _.map(this.imageList, (image:richstudio.IImage)=> {
+                if (image.selected) return {image_id: image.image_id};
+            });
+
+            var deleteImageRequest:richstudio.IDeleteImageRequest = {
+                txt_delete_json: angular.toJson(deletedImageIds)
+            };
+
+            return this.dataService.deleteImages(deleteImageRequest).then(() => {
+                this.getImageList()
+                    .then((imageList:richstudio.IImage[])=> {
+                        this.imageList = imageList;
+                    });
             });
         }
 

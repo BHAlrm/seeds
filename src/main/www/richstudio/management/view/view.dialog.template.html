@@ -14,9 +14,9 @@
                 <button class="btn btn-default  pull-right" ng-click="dialog.showNextImage();">Next</button>
             </div>
             <div style="width: 288px; height: 288px; margin: auto; display: table; overflow: visible;">
-                <img width="128" ng-src="{{dialog.imageList[dialog.displayedImageNumber].image_url}}">
+                <img width="128" ng-src="{{dialog.operatedImage.image_url}}">
             </div>
-            <h4>{{dialog.imageList[dialog.displayedImageNumber].image_title}}</h4>
+            <h4>{{dialog.operatedImage.image_title}}</h4>
         </div>
         <button class="btn btn-default" type="button" ng-click="dialog.rename()">rename</button>
         <button class="btn btn-default" type="button" ng-click="dialog.crop()">crop</button>

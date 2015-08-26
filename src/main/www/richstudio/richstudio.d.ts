@@ -12,50 +12,30 @@ declare module richstudio {
 }
 
 declare module richstudio {
-    enum eUploadAction {
-        UPLOAD = 0,
-        EDIT = 1,
-        SELECT_FROM_GALLERY = 2,
-    }
     enum eViewAction {
         NEXT = 0,
         PREVIOS = 1,
         CLOSE = 2,
     }
-    enum eImageManagementAction {
-        RENAME = 0,
-        CROP = 1,
-        ROTATE = 2,
-        DELETE = 3,
+    interface IImageManagementDialogRequest {
+        operatedImage?: IImage;
     }
-    interface IUploadAction {
-        action: eUploadAction;
-        image: IEditedImage;
+    interface IViewDialogRequest extends IImageManagementDialogRequest {
+        imageList?: IImage[];
     }
-    interface IRenameImageRequestData {
-        image: IImage;
-    }
-    interface IImageManagementRequest {
-        action: eImageManagementAction;
-        data: any;
-    }
-    interface IViewReqest {
-        galleryId?: string;
-        imageId?: string;
-        image?: IImage;
+    interface IUploadDialogRequest extends IImageManagementDialogRequest {
+        isMultiFileSelection: boolean;
     }
     class ManagementService {
         private $modal;
         private $window;
         static $inject: string[];
         constructor($modal: ng.ui.bootstrap.IModalService, $window: ng.IWindowService);
-        openViewDialog(galleryId: string, imageId: string): ng.IPromise<any>;
-        openViewDialogWithImage(image: IImage): ng.IPromise<any>;
-        openRenameDialog(image: IImage): angular.IPromise<string>;
-        openCropDialog(image: IImage): angular.IPromise<ICropRect>;
-        openRotateDialog(image: IImage): angular.IPromise<number>;
-        openGalleryDialog(galleryId: string): ng.IPromise<any>;
-        openUploadDialog(image?: IImage): ng.IPromise<File[]>;
+        openViewDialog(request: IViewDialogRequest): ng.IPromise<any>;
+        openRenameDialog(request: IImageManagementDialogRequest): ng.IPromise<string>;
+        openCropDialog(request: IImageManagementDialogRequest): ng.IPromise<ICropRect>;
+        openRotateDialog(request: IImageManagementDialogRequest): ng.IPromise<number>;
+        openUploadDialog(request: IUploadDialogRequest): ng.IPromise<File[]>;
         uploadImage(image: IImage, cropRect: ICropRect, rotateDegrees: number): ng.IPromise<any>;
         uploadMultiImage(images: IImage[], galleryId: string): ng.IPromise<any>;
     }
@@ -73,8 +53,13 @@ declare module richstudio {
         image_id: string;
         image_name?: string;
         image_title?: string;
+        image_file_name?: string;
+        image_file_dir?: string;
+        image_width?: string;
+        image_height?: string;
         image_url?: string;
         image_create_time?: string;
+        image_update_time?: string;
     }
     interface IGallery {
         imagegallery_id: string;
@@ -119,6 +104,21 @@ declare module richstudio {
         images: IImage[];
         galleryId: string;
     }
+    interface IImageManagementRequest {
+        txt_image_id: string;
+    }
+    interface IEditImageRequest extends IImageManagementRequest {
+        txt_image_title: string;
+    }
+    interface ICropImageRequest extends IImageManagementRequest {
+        txt_crop_json: string;
+    }
+    interface IRotateImageRequest extends IImageManagementRequest {
+        txt_rotate_degree: number;
+    }
+    interface IDeleteImageRequest {
+        txt_delete_json: string;
+    }
     class RichStudioDataService {
         private $http;
         private API;
@@ -132,12 +132,15 @@ declare module richstudio {
         getGalleryByID(id: string): ng.IPromise<IGallery>;
         getImageByID(id: string): ng.IPromise<IImage>;
         deleteGalleries(ids: string[]): ng.IHttpPromise<IResponse<IDeletedData>>;
-        deleteImages(ids: string[]): ng.IHttpPromise<IResponse<IDeletedData>>;
-        editImage(imageId: string, imageTitle: string): ng.IHttpPromise<IResponse<IDeletedData>>;
+        deleteImages(request: IDeleteImageRequest): ng.IHttpPromise<IResponse<IDeletedData>>;
+        editImage(request: IEditImageRequest): ng.IHttpPromise<IResponse<IDeletedData>>;
+        cropImage(request: ICropImageRequest): ng.IHttpPromise<IResponse<IDeletedData>>;
+        rotateImage(request: IRotateImageRequest): ng.IHttpPromise<IResponse<IDeletedData>>;
         uploadImage(request: IUploadImageRequest, progressFn: (ev: ProgressEvent) => any): ng.IHttpPromise<IResponse<IDeletedData>>;
         uploadImageToGallery(request: IUploadMultiImageRequest, progressFn: (ev: ProgressEvent) => any): ng.IHttpPromise<IResponse<IDeletedData>>;
         private getListData<T>(response);
         private getData<T>(response);
+        private formEncrypting(obj);
     }
 }
 
@@ -191,6 +194,9 @@ declare module richstudio {
 }
 
 declare module richstudio {
+}
+
+declare module richstudio {
     interface IRotateScope extends ng.IScope {
         degrees: number;
     }
@@ -207,9 +213,11 @@ declare module richstudio {
         private $modalInstance;
         private $scope;
         private management;
-        private image;
+        private request;
         static $inject: string[];
-        constructor($modalInstance: ng.ui.bootstrap.IModalServiceInstance, $scope: IUploadDialogScope, management: ManagementService, image: IImage);
+        private operatedImage;
+        private isMultiFileSelection;
+        constructor($modalInstance: ng.ui.bootstrap.IModalServiceInstance, $scope: IUploadDialogScope, management: ManagementService, request: IUploadDialogRequest);
         activate(): void;
         upload($files: File[], $file: File): void;
         editImage(): void;
@@ -227,7 +235,4 @@ declare module richstudio {
         progressPercentage: number;
         constructor($modalInstance: ng.ui.bootstrap.IModalServiceInstance, dataService: RichStudioDataService, uploadRequest: any, $scope: ng.IScope);
     }
-}
-
-declare module richstudio {
 }
