@@ -13,48 +13,34 @@ module richstudio {
     
     export class UploadDialogController {
         
-        static $inject:string[] = ['$modalInstance', '$scope', 'management', 'image'];
+        static $inject:string[] = ['$modalInstance', '$scope', 'management', 'request'];
+        
+        private operatedImage:IImage;
+        private isMultiFileSelection:boolean;
+        
         
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
                     private $scope:IUploadDialogScope,
                     private management:ManagementService,
-                    private image:IImage) {
+                    private request:IUploadDialogRequest) {
             this.activate();
         }
 
         public activate() {
-
-
+            angular.extend(this, this.request);
         }
 
         public upload($files:File[], $file:File) {
             if($files.length === 0) return;
-
             this.$modalInstance.close($files);
-
-            //var fr = new FileReader();
-            //angular.forEach($files, (file:File)=>{
-            //    fr.readAsDataURL(file);
-            //});
-            //
-            //fr.onload = (e:Event)=> {
-            //    this.$scope.$apply(() => {
-            //        var fileReader = <FileReader>e.target;
-            //        
-            //        if(this.image){
-            //            this.image.image_url = fileReader.result;
-            //            this.image.file = $file[0];
-            //        }else{
-            //            
-            //        }
-            //      
-            //    });
-            //};
-            
         }
 
         public editImage() {
-            this.management.openViewDialogWithImage(this.image);
+            var viewDialogRequest = <IViewDialogRequest>{
+                operatedImage: this.operatedImage
+            };
+            
+            this.management.openViewDialog(viewDialogRequest);
         }
 
         public selectFormGallery() {

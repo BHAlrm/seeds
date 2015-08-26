@@ -9,17 +9,20 @@ module richstudio {
         constructor() {
             XMLHttpRequest.prototype.setRequestHeader = (function (sup:Function) {
                 return function (header:string, value:any) {
-                    if ((header === "__XHR__") && angular.isFunction(value))
+                    if ((header === "__XHR__") && angular.isFunction(value)){
                         value(this);
-                    else
+                    }
+                    else{
                         sup.apply(this, arguments);
+                    }
                 };
             })(XMLHttpRequest.prototype.setRequestHeader);
         }
 
     }
 
-    angular.module('richstudio.core')
-        .config(RequestHeaderConfig);
+    
+    //angular.module('richstudio.core')
+    //    .config(RequestHeaderConfig);
 
 }

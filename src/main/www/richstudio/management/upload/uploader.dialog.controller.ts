@@ -12,29 +12,33 @@ module richstudio {
                     private uploadRequest:any,
                     private $scope:ng.IScope) {
 
-            if(this.uploadRequest.image){
-                this.dataService.uploadImage(this.uploadRequest, (e:ProgressEvent)=> {
-                    $scope.$apply(()=>{
-                        this.progressPercentage = 100.0 * e.loaded / e.total;
-                    });
-                }).then(()=>{
+            if (this.uploadRequest.image) {
+                
+                this.dataService.uploadImage(this.uploadRequest).then(()=> {
                     $modalInstance.close();
                 });
-            }else{
+            } else {
                 this.dataService.uploadImageToGallery(this.uploadRequest, (e:ProgressEvent)=> {
-                    $scope.$apply(()=>{
+                    $scope.$apply(()=> {
                         this.progressPercentage = 100.0 * e.loaded / e.total;
                     });
-                }).then(()=>{
+                }).then(()=> {
                     $modalInstance.close();
                 });
             }
-            
+
         }
 
+        progressFn = (e:ProgressEvent) => {
+            this.$scope.$apply(()=> {
+                this.progressPercentage = 100.0 * e.loaded / e.total;
+            });
+        };
 
+        uploadFn = (xhr:XMLHttpRequestEventTarget)=> {
+            xhr.addEventListener('progress', this.progressFn);
+        };
     }
-
     angular.module('richstudio.management').controller('UploaderDialogController', UploaderDialogController);
 
 }

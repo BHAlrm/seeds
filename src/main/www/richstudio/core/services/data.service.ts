@@ -3,12 +3,28 @@
  */
 
 module richstudio {
+
+    interface FormData {
+        enctype?:string;
+        append(name: any, value: any, blobName?: string): void;
+    }
+    
+    declare var FormData: {
+        prototype: FormData;
+        new(): FormData;
+    };
+
     export interface IImage {
         image_id: string;
         image_name?: string;
         image_title?: string;
+        image_file_name?: string;
+        image_file_dir?:string;
+        image_width?:string;
+        image_height?:string;
         image_url?: string;
         image_create_time?: string;
+        image_update_time?: string;
     }
 
     export interface IGallery {
@@ -52,21 +68,41 @@ module richstudio {
     }
 
     export interface IUploadImageRequest {
-        image:IImage;
-        cropRect:ICropRect;
-        rotateDegrees?:number
+        image_file:Blob;
+        txt_crop_rect_json:string;
+        txt_rotate_degree?:number
     }
 
     export interface IUploadMultiImageRequest {
-        images:IImage[];
-        galleryId:string;
+        "image_files[]":Blob[];
+        txt_imagegallery_id:string;
+    }
+
+    export interface IImageManagementRequest {
+        txt_image_id:string;
+    }
+
+    export interface IEditImageRequest extends IImageManagementRequest {
+        txt_image_title:string;
+    }
+
+    export interface ICropImageRequest extends IImageManagementRequest {
+        txt_crop_json:string;
+    }
+
+    export interface IRotateImageRequest extends IImageManagementRequest {
+        txt_rotate_degree:number;
+    }
+
+    export interface IDeleteImageRequest {
+        txt_delete_json:string;
     }
 
     export class RichStudioDataService {
         static $inject:string[] = ['$http', 'API', 'DataUtils', 'Upload'];
         config:ng.IRequestShortcutConfig = {
             headers: {
-                "Content-Type": "multipart/form-data"
+                "Content-Type": undefined
             }
         };
 
@@ -134,55 +170,50 @@ module richstudio {
             return this.$http.post<IResponse<IDeletedData>>(this.API.GALLERY + '/delete', fd, this.config);
         }
 
-        public deleteImages(ids:string[]):ng.IHttpPromise<IResponse<IDeletedData>> {
-            var deletedJson:IImage[] = [];
-            if (!angular.isArray(ids)) {
-                ids = [ids.toString()];
-            }
-
-            angular.forEach(ids, (id:string)=> {
-                deletedJson.push({image_id: id});
-            });
-
-            var fd = new FormData();
-            fd.append('txt_delete_json', JSON.stringify(deletedJson));
-
+        public deleteImages(request:IDeleteImageRequest):ng.IHttpPromise<IResponse<IDeletedData>> {
+            var fd = this.formEncrypting(request);
             return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/delete', fd, this.config);
         }
 
-        public editImage(imageId:string, imageTitle:string) {
-            var fd = new FormData();
-            fd.append('txt_image_id', imageId);
-            fd.append('txt_image_title', imageTitle);
-
+        public editImage(request:IEditImageRequest) {
+            var fd = this.formEncrypting(request);
             return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/edit', fd, this.config);
         }
 
-        public uploadImage(request:IUploadImageRequest, progressFn:(ev:ProgressEvent) => any) {
+        public cropImage(request:ICropImageRequest) {
+            var fd = this.formEncrypting(request);
+            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/crop', fd, this.config);
+        }
+
+        public rotateImage(request:IRotateImageRequest) {
+            var fd = this.formEncrypting(request);
+            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/rotate', fd, this.config);
+        }
+
+        public uploadImage(request:IUploadImageRequest) {
             var defaultCropRect:ICropRect = {
                 cx: 100,
                 cy: 100,
                 rect_size: 250
             };
             angular.extend(defaultCropRect, request.cropRect);
+
             var fd = new FormData();
+            fd.enctype = 'multipart/form-data';
+            
+            //fd['image_file'] = request.image.file;
+            //fd['txt_crop_rect_json'] = JSON.stringify(defaultCropRect);
             fd.append('image_file', request.image.file);
+            
             fd.append('txt_crop_rect_json', JSON.stringify(defaultCropRect));
 
             if (request.rotateDegrees) {
+                //fd['txt_rotate_degree'] = request.rotateDegrees;
                 fd.append('txt_rotate_degree', request.rotateDegrees);
             }
 
             var config = angular.copy(this.config);
-            config.headers = {
-                __XHR__: function () {
-                    return function (xhr:XMLHttpRequest) {
-                        xhr.upload.addEventListener("progress", progressFn);
-                    };
-                },
-                "Content-Type": "multipart/form-data"
-            };
-
+            config.transformRequest = angular.identity;
             return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/upload', fd, config);
             //return this.uploader.http(config);
         }
@@ -198,7 +229,7 @@ module richstudio {
 
             var config = angular.copy(this.config);
             config.headers = {
-                __XHR__: function () {
+                __setXHR_: function () {
                     return function (xhr:XMLHttpRequest) {
                         xhr.upload.addEventListener("progress", progressFn);
                     };
@@ -216,6 +247,30 @@ module richstudio {
 
         private getData<T>(response:ng.IHttpPromiseCallbackArg<IResponse<T>>):T {
             return response.data.data;
+        }
+
+        private formEncrypting(obj:any):FormData {
+            var fd = new FormData();
+
+            Object.keys(obj).forEach((property:string)=> {
+                let value = obj[property];
+
+                if (value.type === 'file') {
+                    fd.enctype = 'multipart/form-data';
+                    if (value.files.length > 1) {
+                        for (var i = 0; i < value.files.length; i++) {
+                            fd.append(value.name, value.files[i]);
+                        }
+                    } else {
+                        fd.append(value.name, value.files[0]);
+                    }
+                } else {
+                    fd.append(property, value);
+
+                }
+            });
+
+            return fd;
         }
 
 

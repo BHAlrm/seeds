@@ -3,17 +3,20 @@
  */
 module richstudio {
     class RenameImageDialogController {
-        static $inject:string[] = ['$modalInstance', 'image'];
+        static $inject:string[] = ['$modalInstance', 'request'];
 
+        private operatedImage:IImage;
+        private imageList:IImage[];
         private name:string;
 
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
-                    private image:IImage) {
+                    private request:IImageManagementDialogRequest) {
             this.activate();
         }
 
         public activate() {
-            this.name = angular.copy(this.image.image_title);
+            angular.extend(this, this.request);
+            this.name = angular.copy(this.operatedImage.image_title);
         }
 
         public resolve() {

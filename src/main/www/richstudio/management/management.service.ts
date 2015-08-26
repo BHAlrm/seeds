@@ -3,39 +3,23 @@
  */
 
 module richstudio {
-    export enum eUploadAction{
-        UPLOAD, EDIT, SELECT_FROM_GALLERY
-    }
 
     export enum eViewAction{
         NEXT, PREVIOS, CLOSE
     }
 
-    export enum eImageManagementAction{
-        RENAME, CROP, ROTATE, DELETE
+    export interface IImageManagementDialogRequest{
+        operatedImage?:IImage;
+    }
+    
+    export interface IViewDialogRequest extends IImageManagementDialogRequest{
+        imageList?:IImage[];
     }
 
-    export interface IUploadAction {
-        action: eUploadAction;
-        image: IEditedImage;
+    export interface IUploadDialogRequest extends IImageManagementDialogRequest{
+        isMultiFileSelection:boolean;
     }
-
-    export interface IRenameImageRequestData {
-        image:IImage;
-    }
-
-
-    export interface IImageManagementRequest {
-        action: eImageManagementAction;
-        data: any;
-    }
-
-    export interface IViewReqest {
-        galleryId?: string,
-        imageId?: string,
-        image?: IImage
-    }
-
+    
     export class ManagementService {
         static $inject:string[] = ['$modal', '$window'];
 
@@ -43,59 +27,39 @@ module richstudio {
                     private $window:ng.IWindowService) {
         }
 
-        public openViewDialog(galleryId:string, imageId:string) {
+        public openViewDialog(request:IViewDialogRequest):ng.IPromise<any> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/view/view.template.html',
+                templateUrl: 'richstudio/management/view/view.dialog.template.html',
                 controller: 'ViewImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
-                    request: ()=><IViewReqest>{
-                        galleryId: galleryId,
-                        imageId: imageId
-                    }
+                    request: ()=>request
                 }
             };
-
-
             return this.$modal.open(modalOptions).result;
         }
 
-        public openViewDialogWithImage(image:IImage) {
+      
+        public openRenameDialog(request:IImageManagementDialogRequest):ng.IPromise<string> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/view/view.template.html',
-                controller: 'ViewImageDialogController',
-                controllerAs: 'dialog',
-                resolve: {
-                    request: ()=><IViewReqest>{
-                        image:image
-                    }
-                }
-            };
-
-
-            return this.$modal.open(modalOptions).result;
-        }
-
-        public openRenameDialog(image:IImage):angular.IPromise<string> {
-            var modalOptions = {
-                templateUrl: 'richstudio/management/rename/rename.template.html',
+                templateUrl: 'richstudio/management/rename/rename.dialog.template.html',
                 controller: 'RenameImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
-                    image: ()=>image
+                    request: ()=>request
                 }
             };
 
             return this.$modal.open(modalOptions).result;
         }
 
-        public openCropDialog(image:IImage):angular.IPromise<ICropRect> {
+        public openCropDialog(request:IImageManagementDialogRequest):ng.IPromise<ICropRect> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/crop/crop.template.html',
+                templateUrl: 'richstudio/management/crop/crop.dialog.template.html',
                 controller: 'CropImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
-                    image: ()=>image
+                    request: ()=>request
                 }
             };
 
@@ -103,41 +67,28 @@ module richstudio {
         }
 
 
-        public openRotateDialog(image:IImage):angular.IPromise<number> {
+        public openRotateDialog(request:IImageManagementDialogRequest):ng.IPromise<number> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/rotate/rotate.template.html',
+                templateUrl: 'richstudio/management/rotate/rotate.dialog.template.html',
                 controller: 'RotateImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
-                    image: ()=>image
+                    request: ()=>request
                 }
             };
 
             return this.$modal.open(modalOptions).result;
         }
 
-        public openGalleryDialog(galleryId:string) {
-            var modalOptions = {
-                templateUrl: 'richstudio/management/gallery/galleryDialog.template.html',
-                controller: 'GalleryDialogController',
-                controllerAs: 'dialog',
-                size: 'lg',
-                resolve: {
-                    galleryId: ()=>galleryId
-                }
-            };
-
-            return this.$modal.open(modalOptions).result;
-        }
-
-        public openUploadDialog(image?:IImage):ng.IPromise<File[]> {
+   
+        public openUploadDialog(request:IUploadDialogRequest):ng.IPromise<File[]> {
             var modalOptions = {
                 templateUrl: 'richstudio/management/upload/upload.dialog.template.html',
                 controller: 'UploadDialogController',
                 controllerAs: 'dialog',
                 size: 'sm',
                 resolve: {
-                    image: ()=> image
+                    request: ()=> request
                 }
             };
 
