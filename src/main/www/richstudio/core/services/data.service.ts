@@ -103,7 +103,8 @@ module richstudio {
         config:ng.IRequestShortcutConfig = {
             headers: {
                 "Content-Type": undefined
-            }
+            },
+            transformRequest: angular.identity
         };
 
 
@@ -191,54 +192,14 @@ module richstudio {
         }
 
         public uploadImage(request:IUploadImageRequest) {
-            var defaultCropRect:ICropRect = {
-                cx: 100,
-                cy: 100,
-                rect_size: 250
-            };
-            angular.extend(defaultCropRect, request.cropRect);
-
-            var fd = new FormData();
-            fd.enctype = 'multipart/form-data';
-            
-            //fd['image_file'] = request.image.file;
-            //fd['txt_crop_rect_json'] = JSON.stringify(defaultCropRect);
-            fd.append('image_file', request.image.file);
-            
-            fd.append('txt_crop_rect_json', JSON.stringify(defaultCropRect));
-
-            if (request.rotateDegrees) {
-                //fd['txt_rotate_degree'] = request.rotateDegrees;
-                fd.append('txt_rotate_degree', request.rotateDegrees);
-            }
-
-            var config = angular.copy(this.config);
-            config.transformRequest = angular.identity;
-            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/upload', fd, config);
-            //return this.uploader.http(config);
+            var fd = this.formEncrypting(request);
+            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/upload', fd, this.config);
         }
 
 
-        public uploadImageToGallery(request:IUploadMultiImageRequest, progressFn:(ev:ProgressEvent) => any) {
-            var fd = new FormData();
-            fd.append("txt_imagegallery_id", request.galleryId);
-            angular.forEach(request.images, (image:IImage)=> {
-                fd.append("image_files[]", image.file);
-            });
-
-
-            var config = angular.copy(this.config);
-            config.headers = {
-                __setXHR_: function () {
-                    return function (xhr:XMLHttpRequest) {
-                        xhr.upload.addEventListener("progress", progressFn);
-                    };
-                },
-                "Content-Type": "multipart/form-data"
-            };
-
-            return this.$http.post<IResponse<IDeletedData>>(this.API.GALLERY + '/upload_image', fd, config);
-
+        public uploadImageToGallery(request:IUploadMultiImageRequest) {
+            var fd = this.formEncrypting(request);
+            return this.$http.post<IResponse<IDeletedData>>(this.API.GALLERY + '/upload_image', fd, this.config);
         }
 
         private getListData<T>(response:ng.IHttpPromiseCallbackArg<IResponse<IList<T>>>):IList<T> {
