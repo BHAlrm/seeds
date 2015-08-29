@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/11/2015 AD.
  */
-module richstudio {
+module app.richstudio {
     class ViewImageDialogController {
         static $inject:string[] = ['$modalInstance', 'RichStudioDataService', '$filter', 'management', 'request'];
 
@@ -114,5 +114,5 @@ module richstudio {
     }
 
 
-    angular.module('richstudio.management').controller('ViewImageDialogController', ViewImageDialogController);
+    angular.module('app.richstudio.management').controller('ViewImageDialogController', ViewImageDialogController);
 }

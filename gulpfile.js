@@ -2,6 +2,7 @@
  * Created by BHAlrM on 6/13/2015 AD.
  */
 var fs = require('fs');
+var argv = require('yargs').argv;
 var path = require('path');
 var config = require('./gulp/gulp.config.js')();
 var utils = require('./gulp/gulp.utils.js')();
@@ -23,7 +24,7 @@ var templateTasks = [];
 
 function getFolders(dir) {
     return fs.readdirSync(dir)
-        .filter(function(file) {
+        .filter(function (file) {
             return fs.statSync(path.join(dir, file)).isDirectory();
         });
 }
@@ -81,54 +82,74 @@ function serve() {
         });
 }
 
-function script(cb) {
+function script() {
 
     var folders = getFolders(config.src);
-    
 
-    folders.forEach(function(folder) {
+
+    folders.forEach(function (folder) {
         var src = path.join(config.src, folder, '/**/*.ts');
         var exSrc = '!' + path.join(config.src, folder, folder + '.d.ts');
-        var out = path.join(folder, folder +'.js');
-        
-        if(config.shim[folder]){
+        var jsOut = path.join(folder, folder + '.js');
+        var dOut = path.join('app', folder + '.d.ts');
+
+        if (config.shim[folder]) {
             console.log("glob src = " + [src, exSrc]);
-            var scriptFn = function(){
-                
+
+            var jsFn = function (tsResult) {
+                return tsResult.js
+                    .pipe(plugins.angularFilesort())
+                    .pipe(plugins.concat(jsOut)) // You can use other plugins that also support gulp-sourcemaps 
+                    .pipe(plugins.sourcemaps.write({addComment: false})) // This means sourcemaps will be generated
+                    .pipe(gulp.dest(config.temp));
+            };
+
+            var dFn = function (tsResult) {
+                return tsResult.dts
+                    .pipe(plugins.concat(dOut))
+                    .pipe(plugins.sourcemaps.write({addComment: false})) // This means sourcemaps will be generated
+                    .pipe(gulp.dest(config.src));
+            };
+
+            var scriptFn = function () {
+
                 var tsResult = gulp
                     .src([src, exSrc])
                     .pipe(plugins.sourcemaps.init()) // This means sourcemaps will be generated
                     .pipe(plugins.typescript(tsProject));
+                var js = jsFn(tsResult);
+                var d = dFn(tsResult);
 
-                var js = tsResult.js
-                    .pipe(plugins.angularFilesort())
-                    .pipe(plugins.concat(out)) // You can use other plugins that also support gulp-sourcemaps 
-                    .pipe(plugins.sourcemaps.write({addComment: false})) // This means sourcemaps will be generated
-                    .pipe(gulp.dest(config.temp));
-
-                var d = tsResult.dts
-                    .pipe(plugins.concat(out.replace('.js', '.d.ts'))) // You can use other plugins that also support gulp-sourcemaps 
-                    .pipe(plugins.sourcemaps.write({addComment: false})) // This means sourcemaps will be generated
-                    .pipe(gulp.dest(config.src));
-                
-                
-                return merge(js, d);
+                return merge(d, js);
             };
-            
+
+            var scriptAppFn = function () {
+
+                var tsResult = gulp
+                    .src([src, exSrc])
+                    .pipe(plugins.sourcemaps.init()) // This means sourcemaps will be generated
+                    .pipe(plugins.typescript(tsProject));
+                var js = jsFn(tsResult);
+
+                return js;
+            };
+
+
             var task = 'script-' + folder;
             var templateTask = 'template-' + folder;
-            gulp.task(task, scriptFn);
-            gulp.task(templateTask, templatecache(folder));
-            
-            if(folder !== 'app'){
+            if (folder !== 'app') {
                 tasks.push(task);
+                gulp.task(task, scriptFn);
+            } else {
+                gulp.task(task, scriptAppFn);
             }
+
+            gulp.task(templateTask, templatecache(folder));
             templateTasks.push(templateTask);
         }
     });
     console.log("tasks = " + tasks);
     console.log("template = " + templateTasks);
-    cb();
 }
 
 
@@ -161,7 +182,7 @@ function clear() {
 function templatecache(module) {
     var template = path.join(config.src, module + '/**/*.template.html');
 
-    return function(){
+    return function () {
         console.log("converting " + template + " to template cache");
         return gulp.src(template)
             .pipe(plugins.angularTemplatecache({root: module, module: module}))
@@ -183,27 +204,29 @@ function inject() {
 }
 
 
-function injectRef() {
-    var injectRefOptions = {
-        relative: true,
-        starttag: '\/\/\/<reference path="',
-        endtag: '"\/>',
-        transform: function (filepath, file, i, length) {
-            return filepath;
-        }
-    };
+function injectLibsReference() {
 
     return gulp
-        .src(config.ts.all)
-        .pipe(plugins.inject(gulp.src('typing/tsd.d.ts'), injectRefOptions)).pipe(gulp.dest('src/main/www'));
+        .src(config.typescript.modules)
+        .pipe(plugins.inject(gulp.src(config.typescript.declarations.libs), config.injection.typesciptLibsOptions)).pipe(gulp.dest(config.src));
 }
+
+
+function injectDepsReference() {
+    var out = path.join(config.src, 'app');
+
+    return gulp
+        .src(config.app.module)
+        .pipe(plugins.inject(gulp.src(config.typescript.declarations.deps), config.injection.typesciptReferenceOptions)).pipe(gulp.dest(out));
+}
+
 
 function live() {
     var folders = getFolders(config.src);
-    folders.forEach(function(folder) {
-        if(config.shim[folder]){
+    folders.forEach(function (folder) {
+        if (config.shim[folder]) {
             var ts = path.join(config.src, folder, '**/*.ts');
-            var exTs= '!' + path.join(config.src, folder, folder + '.d.ts');
+            var exTs = '!' + path.join(config.src, folder, folder + '.d.ts');
             var targetTs = [ts, exTs];
             var targetTemplate = path.join(config.src, folder, '**/*.template.html');
             var scriptTask = 'script-' + folder;
@@ -212,7 +235,7 @@ function live() {
             gulp.watch(targetTemplate, [templateTask]).on('change', changeEvent);
         }
     });
-    
+
     gulp.watch(config.app.less, style).on('change', changeEvent);
 }
 
@@ -240,24 +263,20 @@ gulp.task('copy-index', copyIndexHtml);
 gulp.task('copy-libs', copyLibs);
 gulp.task('copy-assets', copyAssets);
 gulp.task('copy', ['copy-index', 'copy-libs', 'copy-assets']);
-gulp.task('inject-ref', injectRef);
-//gulp.task('script-app', scriptApp);
-//gulp.task('script-richstudio', scriptRichStudio);
 
 gulp.task('style', style);
+gulp.task('injectLibs', injectLibsReference);
+gulp.task('injectDeps', injectDepsReference);
 gulp.task('inject', ['copy', 'style'], inject);
-gulp.task('inittask', script);
-gulp.task('script', ['clear', 'inittask'], function(cb){
-    var runs = tasks.concat(templateTasks);
-    runs.push('script-app');
-    runs.push('inject');
-    runs.push(cb);
-    plugins.runSequence.apply(this, runs);
+gulp.task('inittask', ['injectLibs'], script);
+gulp.task('script', ['clear', 'inittask'], function (cb) {
+    var allTask = tasks.concat(templateTasks);
+    allTask.push('injectDeps');
+    allTask.push('script-app');
+    allTask.push('inject');
+    allTask.push(cb);
+    plugins.sequence.apply(this, allTask);
 });
-//log('compiled typescript....');
-//plugins.runSequence('script-app', 'script-richstudio', 'inject', cb);
-
-//gulp.task('optimize', ['script', 'copy', 'templatecache'], optimize);
 
 // serve website to localhost
 

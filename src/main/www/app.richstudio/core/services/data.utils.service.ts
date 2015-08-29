@@ -2,7 +2,7 @@
  * Created by BHAlrM on 8/9/2015 AD.
  */
 
-module richstudio {
+module app.richstudio {
     export class DataUtils {
 
         static $inject:string[] = [];
@@ -13,5 +13,5 @@ module richstudio {
         
     }
 
-    angular.module('richstudio.core').service('DataUtils', DataUtils)
+    angular.module('app.richstudio.core').service('DataUtils', DataUtils)
 }

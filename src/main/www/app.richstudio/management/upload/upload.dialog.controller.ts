@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/12/2015 AD.
  */
-module richstudio {
+module app.richstudio {
 
     export interface IUploadDialogScope extends ng.IScope {
         fileChange():void;
@@ -49,5 +49,5 @@ module richstudio {
 
     }
 
-    angular.module('richstudio.management').controller('UploadDialogController', UploadDialogController);
+    angular.module('app.richstudio.management').controller('UploadDialogController', UploadDialogController);
 }

@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/13/2015 AD.
  */
-module richstudio {
+module app.richstudio {
 
     export interface IRotateScope extends ng.IScope{
         degrees: number
@@ -39,5 +39,5 @@ module richstudio {
         }
     }
 
-    angular.module('richstudio.management').directive('rotate', rotateDirectiveFactory);
+    angular.module('app.richstudio.management').directive('rotate', rotateDirectiveFactory);
 }

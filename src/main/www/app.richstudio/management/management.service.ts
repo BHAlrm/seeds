@@ -2,24 +2,24 @@
  * Created by BHAlrM on 8/7/2015 AD.
  */
 
-module richstudio {
+module app.richstudio {
 
     export enum eViewAction{
         NEXT, PREVIOS, CLOSE
     }
 
-    export interface IImageManagementDialogRequest{
+    export interface IImageManagementDialogRequest {
         operatedImage?:IImage;
     }
-    
-    export interface IViewDialogRequest extends IImageManagementDialogRequest{
+
+    export interface IViewDialogRequest extends IImageManagementDialogRequest {
         imageList?:IImage[];
     }
 
-    export interface IUploadDialogRequest extends IImageManagementDialogRequest{
+    export interface IUploadDialogRequest extends IImageManagementDialogRequest {
         isMultiFileSelection:boolean;
     }
-    
+
     export class ManagementService {
         static $inject:string[] = ['$modal', '$window'];
 
@@ -29,7 +29,7 @@ module richstudio {
 
         public openViewDialog(request:IViewDialogRequest):ng.IPromise<any> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/view/view.dialog.template.html',
+                templateUrl: 'app.richstudio/management/view/view.dialog.template.html',
                 controller: 'ViewImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
@@ -39,10 +39,10 @@ module richstudio {
             return this.$modal.open(modalOptions).result;
         }
 
-      
+
         public openRenameDialog(request:IImageManagementDialogRequest):ng.IPromise<string> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/rename/rename.dialog.template.html',
+                templateUrl: 'app.richstudio/management/rename/rename.dialog.template.html',
                 controller: 'RenameImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
@@ -55,7 +55,7 @@ module richstudio {
 
         public openCropDialog(request:IImageManagementDialogRequest):ng.IPromise<ICropRect> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/crop/crop.dialog.template.html',
+                templateUrl: 'app.richstudio/management/crop/crop.dialog.template.html',
                 controller: 'CropImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
@@ -69,7 +69,7 @@ module richstudio {
 
         public openRotateDialog(request:IImageManagementDialogRequest):ng.IPromise<number> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/rotate/rotate.dialog.template.html',
+                templateUrl: 'app.richstudio/management/rotate/rotate.dialog.template.html',
                 controller: 'RotateImageDialogController',
                 controllerAs: 'dialog',
                 resolve: {
@@ -80,10 +80,10 @@ module richstudio {
             return this.$modal.open(modalOptions).result;
         }
 
-   
+
         public openUploadDialog(request:IUploadDialogRequest):ng.IPromise<File[]> {
             var modalOptions = {
-                templateUrl: 'richstudio/management/upload/upload.dialog.template.html',
+                templateUrl: 'app.richstudio/management/upload/upload.dialog.template.html',
                 controller: 'UploadDialogController',
                 controllerAs: 'dialog',
                 size: 'sm',
@@ -99,7 +99,7 @@ module richstudio {
         public uploadImage(image:IImage, cropRect:ICropRect, rotateDegrees:number) {
 
             var modalOptions = {
-                templateUrl: 'richstudio/management/upload/uploader.dialog.template.html',
+                templateUrl: 'app.richstudio/management/upload/uploader.dialog.template.html',
                 controller: 'UploaderDialogController',
                 controllerAs: 'dialog',
                 size: 'sm',
@@ -107,9 +107,9 @@ module richstudio {
                 resolve: {
 
                     uploadRequest: () => <IUploadImageRequest>{
-                        image: image,
-                        cropRect: cropRect,
-                        rotateDegrees: rotateDegrees
+                        image_file: image.file,
+                        txt_crop_rect_json: angular.toJson(cropRect),
+                        txt_rotate_degree: rotateDegrees
                     }
                 }
             };
@@ -119,17 +119,21 @@ module richstudio {
         }
 
         public uploadMultiImage(images:IImage[], galleryId:string) {
-
+            var imageFiles:Blob[];
+            angular.forEach(images, (image:IImage)=> {
+                imageFiles.push(image.file);
+            });
+            
             var modalOptions = {
-                templateUrl: 'richstudio/management/upload/uploader.dialog.template.html',
+                templateUrl: 'app.richstudio/management/upload/uploader.dialog.template.html',
                 controller: 'UploaderDialogController',
                 controllerAs: 'dialog',
                 size: 'sm',
                 backdrop: 'static',
                 resolve: {
                     uploadRequest: () => <IUploadMultiImageRequest>{
-                        images:images,
-                        galleryId:galleryId
+                        "image_files[]": imageFiles,
+                        txt_imagegallery_id: galleryId
                     }
                 }
             };
@@ -140,5 +144,5 @@ module richstudio {
 
     }
 
-    angular.module('richstudio.management').service('management', ManagementService);
+    angular.module('app.richstudio.management').service('management', ManagementService);
 }

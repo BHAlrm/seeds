@@ -8,10 +8,10 @@ module.exports = function () {
          */
         temp: '.tmp',
         src: src,
-        
-        shim:{
-            app: {deps: ['angular', 'richstudio']},
-            richstudio : {deps: ['angular', 'richstudio']}
+
+        shim: {
+            app: {deps: ['angular']},
+            'app.richstudio': {deps: ['app']}
         },
 
         app: {
@@ -23,6 +23,7 @@ module.exports = function () {
                 assets: '.tmp/app/assets'
             },
             ts: src + '/app/**/*.ts',
+            module: src + '/app/app.module.ts',
             libs: src + '/libs/**/*.js',
             less: src + '/assets/less/main.less',
             assets: [src + '/assets/**/*', '!' + src + '/assets/less/**/*'],
@@ -33,20 +34,49 @@ module.exports = function () {
          * Richstudio settings
          */
         richstudio: {
-            src: 'src/main/www/richstudio/',
+            src: 'src/main/www/app.richstudio/',
             temp: {
-                js: 'richstudio/richstudio.js',
+                js: 'app.richstudio/richstudio.js',
                 libs: '.tmp/libs/**/*.js'
             },
-            ts: [src + '/richstudio/**/*.ts', '!' + src + '/richstudio/**/*.d.ts'],
-            template: src + '/richstudio/**/*.template.html'
+            ts: [src + '/app.richstudio/**/*.ts', '!' + src + '/app.richstudio/**/*.d.ts'],
+            template: src + '/app.richstudio/**/*.template.html'
         },
 
         /**
          * Typescirpt settings
          */
         typescript: {
-            declarations: 'typing'
+            declarations: {
+                libs: ['typing/tsd.d.ts'],
+                deps: [src + '/app/*.d.ts']
+            },
+            modules: src + '/**/*.module.ts'
+        },
+
+
+        /**
+         * Injection settings
+         */
+
+        injection: {
+            typesciptReferenceOptions: {
+                relative: true,
+                starttag: '\/* inject:reference:{{ext}} *\/',
+                endtag: '\/* endinject *\/',
+                transform: function (filepath) {
+                    return '///<reference path="' + filepath + '"/>';
+                }
+            },
+
+            typesciptLibsOptions: {
+                relative: true,
+                starttag: '\/* inject:libs:{{ext}} *\/',
+                endtag: '\/* endinject *\/',
+                transform: function (filepath) {
+                    return '///<reference path="' + filepath + '"/>';
+                }
+            }
         },
 
         /**

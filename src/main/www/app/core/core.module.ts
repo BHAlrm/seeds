@@ -7,6 +7,6 @@ module app{
     angular.module('app.core', [
         'ngRoute',
         'ui.bootstrap',
-        'richstudio'
+        'app.richstudio'
     ]);
 }

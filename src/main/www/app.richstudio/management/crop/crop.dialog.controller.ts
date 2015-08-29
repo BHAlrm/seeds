@@ -1,13 +1,23 @@
 /**
  * Created by BHAlrM on 8/11/2015 AD.
  */
-module richstudio {
-    class RenameImageDialogController {
+module app.richstudio {
+    export interface ICropRect{
+        cx: number,
+        cy: number,
+        cw?: number,
+        ch?: number,
+        width?: number,
+        height?: number,
+        rect_size?: number
+    }
+    
+    class CropImageDialogController {
         static $inject:string[] = ['$modalInstance', 'request'];
 
         private operatedImage:IImage;
         private imageList:IImage[];
-        private name:string;
+        cropRect:ICropRect;
 
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
                     private request:IImageManagementDialogRequest) {
@@ -16,21 +26,18 @@ module richstudio {
 
         public activate() {
             angular.extend(this, this.request);
-            this.name = angular.copy(this.operatedImage.image_title);
         }
 
         public resolve() {
-            this.$modalInstance.close(this.name);
+            this.$modalInstance.close(this.cropRect);
         }
 
         public dismiss() {
             this.$modalInstance.dismiss();
         }
 
-        
-
     }
 
 
-    angular.module('richstudio.management').controller('RenameImageDialogController', RenameImageDialogController);
+    angular.module('app.richstudio.management').controller('CropImageDialogController', CropImageDialogController);
 }

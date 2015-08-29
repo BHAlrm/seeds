@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/23/2015 AD.
  */
-module richstudio {
+module app.richstudio {
 
     export class UploaderDialogController {
         static $inject:string[] = ['$modalInstance', 'RichStudioDataService', 'uploadRequest', '$scope'];
@@ -18,11 +18,7 @@ module richstudio {
                     $modalInstance.close();
                 });
             } else {
-                this.dataService.uploadImageToGallery(this.uploadRequest, (e:ProgressEvent)=> {
-                    $scope.$apply(()=> {
-                        this.progressPercentage = 100.0 * e.loaded / e.total;
-                    });
-                }).then(()=> {
+                this.dataService.uploadImageToGallery(this.uploadRequest).then(()=> {
                     $modalInstance.close();
                 });
             }
@@ -39,6 +35,6 @@ module richstudio {
             xhr.addEventListener('progress', this.progressFn);
         };
     }
-    angular.module('richstudio.management').controller('UploaderDialogController', UploaderDialogController);
+    angular.module('app.richstudio.management').controller('UploaderDialogController', UploaderDialogController);
 
 }

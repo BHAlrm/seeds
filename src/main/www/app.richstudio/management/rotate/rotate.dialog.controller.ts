@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/11/2015 AD.
  */
-module richstudio {
+module app.richstudio {
     class RotateImageDialogController {
         static $inject:string[] = ['$modalInstance', 'request'];
 
@@ -33,5 +33,5 @@ module richstudio {
     }
 
 
-    angular.module('richstudio.management').controller('RotateImageDialogController', RotateImageDialogController);
+    angular.module('app.richstudio.management').controller('RotateImageDialogController', RotateImageDialogController);
 }

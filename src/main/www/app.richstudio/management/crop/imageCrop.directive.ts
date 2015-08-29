@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/23/2015 AD.
  */
-module richstudio {
+module app.richstudio {
     function ImageCropDirectiveFactory() {
 
         var directive:ng.IDirective = {
@@ -709,6 +709,6 @@ module richstudio {
     }
 
 
-    angular.module('richstudio.management').directive('imageCrop', ImageCropDirectiveFactory);
+    angular.module('app.richstudio.management').directive('imageCrop', ImageCropDirectiveFactory);
 
 }

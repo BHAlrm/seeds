@@ -1,7 +1,7 @@
 /**
  * Created by BHAlrM on 8/9/2015 AD.
  */
-module richstudio {
+module app.richstudio {
 
     export interface IImage {
         selected?: boolean;
@@ -96,5 +96,5 @@ module richstudio {
         }
 
     }
-    angular.module('richstudio.management').controller('GalleryDialogController', GalleryDialogController);
+    angular.module('app.richstudio.management').controller('GalleryDialogController', GalleryDialogController);
 }

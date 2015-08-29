@@ -2,7 +2,7 @@
  * Created by BHAlrM on 8/9/2015 AD.
  */
 
-module richstudio {
+module app.richstudio {
 
     interface FormData {
         enctype?:string;
@@ -226,8 +226,12 @@ module richstudio {
                         fd.append(value.name, value.files[0]);
                     }
                 } else {
-                    fd.append(property, value);
-
+                    if(angular.isObject(value)){
+                        fd.append(property, angular.toJson(value));
+                    }else{
+                        fd.append(property, value);
+                    }
+                    
                 }
             });
 
@@ -237,5 +241,5 @@ module richstudio {
 
     }
 
-    angular.module('richstudio.core').service('RichStudioDataService', RichStudioDataService)
+    angular.module('app.richstudio.core').service('RichStudioDataService', RichStudioDataService)
 }
