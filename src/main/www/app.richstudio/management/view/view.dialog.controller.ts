@@ -3,7 +3,7 @@
  */
 module app.richstudio {
     class ViewImageDialogController {
-        static $inject:string[] = ['$modalInstance', 'RichStudioDataService', '$filter', 'management', 'request'];
+        static $inject:string[] = ['$modalInstance', 'RichStudioDataService', '$filter', 'management', 'request', 'notify'];
 
         private operatedImage:IImage;
         private imageList:IImage[];
@@ -14,7 +14,8 @@ module app.richstudio {
                     private dataService:RichStudioDataService,
                     private $filter:ng.IFilterService,
                     private management:ManagementService,
-                    private request:IViewDialogRequest) {
+                    private request:IViewDialogRequest,
+                    private notify:ng.cgNotify.INotifyService) {
             this.activate();
         }
 
@@ -60,8 +61,8 @@ module app.richstudio {
                     };
 
                     this.dataService.editImage(request).then(()=> {
-                        alert('successfully rename image');
                         this.operatedImage.image_title = newName;
+                        this.notify({message:'the image has been rename to '  + newName, classes: 'alert alert-success'});
                     });
                 }
             );
@@ -77,7 +78,7 @@ module app.richstudio {
                 };
 
                 this.dataService.rotateImage(request).then(()=> {
-                    alert('successfully rotate :' + rotateDegrees);
+                    this.notify({message:'the image has been rotate '  + rotateDegrees + ' degrees.', classes: 'alert alert-success'});
                 });
             })
         }
@@ -92,7 +93,7 @@ module app.richstudio {
                 };
 
                 this.dataService.cropImage(request).then(()=> {
-                    alert('successfully crop :' + JSON.stringify(cropRect));
+                    this.notify({message:'the image has been crop :' + JSON.stringify(cropRect) , classes: 'alert alert-success'});
                 });
             });
         }
@@ -106,7 +107,7 @@ module app.richstudio {
             return this.dataService.deleteImages(deleteImageRequest).then(() => {
                 var index = this.imageList.indexOf(this.operatedImage);
                 this.imageList.splice(index, 1);
-                alert('successfully delete image :' + JSON.stringify(this.operatedImage));
+                this.notify({message:'the image has been deleted', classes: 'alert alert-danger'});
                 this.dismiss();
             });
         }

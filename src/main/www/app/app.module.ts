@@ -6,7 +6,7 @@
 /* endinject */
 
 /* inject:reference:ts */
-///<reference path="app.richstudio.d.ts"/>
+///<reference path="../.d/app.richstudio.d.ts"/>
 /* endinject */
 
 module app {

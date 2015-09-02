@@ -51,7 +51,6 @@ module app {
         
         public submit(){
             this.management.uploadMultiImage(this.images, "0").then(()=>{
-                //alert('successfully upload image');
             });
         }
 

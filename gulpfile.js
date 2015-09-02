@@ -43,6 +43,7 @@ function log(msg) {
 
 function changeEvent(event) {
     var srcPattern = new RegExp('/.*(?=/' + config.app + ')/');
+    //log('File ' + event.path.replace(srcPattern, '') + ' ' + event.type);
     log('File ' + event.path.replace(srcPattern, '') + ' ' + event.type);
 }
 
@@ -89,9 +90,9 @@ function script() {
 
     folders.forEach(function (folder) {
         var src = path.join(config.src, folder, '/**/*.ts');
-        var exSrc = '!' + path.join(config.src, folder, folder + '.d.ts');
+        var exSrc = '!' + path.join(config.src, 'app', folder + '.d.ts');
         var jsOut = path.join(folder, folder + '.js');
-        var dOut = path.join('app', folder + '.d.ts');
+        var dOut = path.join(folder + '.d.ts');
 
         if (config.shim[folder]) {
             console.log("glob src = " + [src, exSrc]);
@@ -108,7 +109,7 @@ function script() {
                 return tsResult.dts
                     .pipe(plugins.concat(dOut))
                     .pipe(plugins.sourcemaps.write({addComment: false})) // This means sourcemaps will be generated
-                    .pipe(gulp.dest(config.src));
+                    .pipe(gulp.dest(config.typescript.declarations.app));
             };
 
             var scriptFn = function () {
@@ -123,27 +124,13 @@ function script() {
                 return merge(d, js);
             };
 
-            var scriptAppFn = function () {
-
-                var tsResult = gulp
-                    .src([src, exSrc])
-                    .pipe(plugins.sourcemaps.init()) // This means sourcemaps will be generated
-                    .pipe(plugins.typescript(tsProject));
-                var js = jsFn(tsResult);
-
-                return js;
-            };
-
-
             var task = 'script-' + folder;
             var templateTask = 'template-' + folder;
             if (folder !== 'app') {
                 tasks.push(task);
-                gulp.task(task, scriptFn);
-            } else {
-                gulp.task(task, scriptAppFn);
             }
 
+            gulp.task(task, scriptFn);
             gulp.task(templateTask, templatecache(folder));
             templateTasks.push(templateTask);
         }
@@ -193,13 +180,13 @@ function templatecache(module) {
 
 function inject() {
     return gulp.src(config.temp + '/index.html')
-        .pipe(plugins.inject(gulp.src([config.temp + '/**/*.js', '!' + config.temp + '/libs/**/*.js']).pipe(plugins.angularFilesort()), {relative: true}))
-        .pipe(plugins.inject(gulp.src(config.temp + '/**/*.css', {read: false}), {relative: true}))
         .pipe(plugins.inject(gulp.src(bowerFiles(), {read: false}), {
             name: 'bower',
             ignorePath: config.src,
             addRootSlash: false
         }, {relative: true}))
+        .pipe(plugins.inject(gulp.src([config.temp + '/**/*.js', '!' + config.temp + '/libs/**/*.js']).pipe(plugins.angularFilesort()), {relative: true}))
+        .pipe(plugins.inject(gulp.src([config.temp + '/app/assets/css/main.css'], {read: false}), {relative: true}))
         .pipe(gulp.dest(config.temp));
 }
 
@@ -217,7 +204,7 @@ function injectDepsReference() {
 
     return gulp
         .src(config.app.module)
-        .pipe(plugins.inject(gulp.src(config.typescript.declarations.deps), config.injection.typesciptReferenceOptions)).pipe(gulp.dest(out));
+        .pipe(plugins.inject(gulp.src(config.app.deps), config.injection.typesciptReferenceOptions)).pipe(gulp.dest(out));
 }
 
 
@@ -226,16 +213,17 @@ function live() {
     folders.forEach(function (folder) {
         if (config.shim[folder]) {
             var ts = path.join(config.src, folder, '**/*.ts');
-            var exTs = '!' + path.join(config.src, folder, folder + '.d.ts');
+            var exTs = '!' + path.join(config.src, '**/*.d.ts');
             var targetTs = [ts, exTs];
             var targetTemplate = path.join(config.src, folder, '**/*.template.html');
             var scriptTask = 'script-' + folder;
             var templateTask = 'template-' + folder;
+            
             gulp.watch(targetTs, [scriptTask]).on('change', changeEvent);
             gulp.watch(targetTemplate, [templateTask]).on('change', changeEvent);
         }
     });
-
+    
     gulp.watch(config.app.less, style).on('change', changeEvent);
 }
 

@@ -6,23 +6,24 @@ module app.richstudio {
     export interface IUploadDialogScope extends ng.IScope {
         fileChange():void;
     }
-    
-    export interface IImage{
+
+    export interface IImage {
         file?:File
     }
-    
+
     export class UploadDialogController {
-        
-        static $inject:string[] = ['$modalInstance', '$scope', 'management', 'request'];
-        
+
+        static $inject:string[] = ['$modalInstance', '$scope', 'management', 'request', 'notify'];
+
         private operatedImage:IImage;
         private isMultiFileSelection:boolean;
-        
-        
+
+
         constructor(private $modalInstance:ng.ui.bootstrap.IModalServiceInstance,
                     private $scope:IUploadDialogScope,
                     private management:ManagementService,
-                    private request:IUploadDialogRequest) {
+                    private request:IUploadDialogRequest,
+                    private notify:ng.cgNotify.INotifyService) {
             this.activate();
         }
 
@@ -31,7 +32,7 @@ module app.richstudio {
         }
 
         public upload($files:File[], $file:File) {
-            if($files.length === 0) return;
+            if ($files.length === 0) return;
             this.$modalInstance.close($files);
         }
 
@@ -39,12 +40,18 @@ module app.richstudio {
             var viewDialogRequest = <IViewDialogRequest>{
                 operatedImage: this.operatedImage
             };
-            
+
             this.management.openViewDialog(viewDialogRequest);
         }
 
         public selectFormGallery() {
-            this.$modalInstance.close('select');
+            var galleryDialogRequest = <IGalleryDialogRequest>{
+                galleryId: '0'
+            };
+            this.management.openGalleryDialog(galleryDialogRequest).then((image:IImage)=>{
+                this.operatedImage = image;
+                this.notify({message:'selected image from gallery', classes: 'alert-danger'});
+            });
         }
 
     }

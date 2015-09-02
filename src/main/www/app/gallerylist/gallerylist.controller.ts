@@ -9,7 +9,7 @@ module app{
     }
     
     class GalleryListController{
-        static $inject:string[] = ['RichStudioDataService', 'lodash', '$location'];
+        static $inject:string[] = ['RichStudioDataService', 'lodash', '$location', 'management'];
         
         private curPage:number;
         private perPage:number;
@@ -19,7 +19,11 @@ module app{
         private search:IGallery;
         private galleryList:IGallery[];
         
-        constructor(private dataService:richstudio.RichStudioDataService, private _:_.LoDashStatic, private $location:ng.ILocationService) {
+        constructor(private dataService:richstudio.RichStudioDataService, 
+                    private _:_.LoDashStatic, 
+                    private $location:ng.ILocationService,
+                    private management:richstudio.ManagementService
+        ) {
             this.activate();
         }
         
@@ -40,7 +44,15 @@ module app{
         public openGallery(id:number){
             this.$location.path('/gallery/' + id);
         }
-        
+
+        private create(){
+            this.management.openCreateGalleryDialog(1).then((request:richstudio.ICreateGalleryRequest)=>{
+                this.getGalleryList().then((galleryList: richstudio.IGallery[])=>{
+                    this.galleryList = galleryList;
+                });
+
+            });
+        }
         
         public clearAll(){
             this.setSelect(false);

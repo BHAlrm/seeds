@@ -6,10 +6,10 @@ module app.richstudio {
 
     interface FormData {
         enctype?:string;
-        append(name: any, value: any, blobName?: string): void;
+        append(name:any, value:any, blobName?:string): void;
     }
-    
-    declare var FormData: {
+
+    declare var FormData:{
         prototype: FormData;
         new(): FormData;
     };
@@ -41,12 +41,6 @@ module app.richstudio {
         per_page: string;
         sortby_id?: string;
         dataList?: T[];
-    }
-
-    export interface IEditedImage extends IImage {
-        image_file : any,
-        txt_crop_json? : Object
-        txt_rotate_degree? : number
     }
 
     export interface IRequestListParams {
@@ -97,6 +91,12 @@ module app.richstudio {
     export interface IDeleteImageRequest {
         txt_delete_json:string;
     }
+    
+    export interface ICreateGalleryRequest{
+        txt_name:string;
+        txt_title?:string;
+        txt_description?:string;
+    }
 
     export class RichStudioDataService {
         static $inject:string[] = ['$http', 'API', 'DataUtils', 'Upload'];
@@ -109,6 +109,11 @@ module app.richstudio {
 
 
         constructor(private $http:ng.IHttpService, private API:IApi, private utils:DataUtils, private uploader:ng.angularFileUpload.IUploadService) {
+        }
+        
+        public addGallery(request:ICreateGalleryRequest):ng.IHttpPromise<IResponse<IGallery>>{
+            var fd = this.formEncrypting(request);
+            return this.$http.post<IResponse<IGallery>>(this.API.GALLERY + '/add', fd, this.config);
         }
 
         public getGalleryList(curPage:number, perPage:number, sortBy?:string):ng.IPromise<IList<IGallery>> {
@@ -191,15 +196,19 @@ module app.richstudio {
             return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/rotate', fd, this.config);
         }
 
-        public uploadImage(request:IUploadImageRequest) {
+        public uploadImage(request:IUploadImageRequest, processFn:()=>(xhr:XMLHttpRequest)=>void) {
             var fd = this.formEncrypting(request);
-            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/upload', fd, this.config);
+            var config = angular.copy(this.config);
+            config.headers.__setXHR_ = processFn;
+            return this.$http.post<IResponse<IDeletedData>>(this.API.IMAGE + '/upload', fd, config);
         }
 
 
-        public uploadImageToGallery(request:IUploadMultiImageRequest) {
+        public uploadImageToGallery(request:IUploadMultiImageRequest, processFn:()=>(xhr:XMLHttpRequest)=>void) {
             var fd = this.formEncrypting(request);
-            return this.$http.post<IResponse<IDeletedData>>(this.API.GALLERY + '/upload_image', fd, this.config);
+            var config = angular.copy(this.config);
+            config.headers.__setXHR_ = processFn;
+            return this.$http.post<IResponse<IDeletedData>>(this.API.GALLERY + '/upload_image', fd, config);
         }
 
         private getListData<T>(response:ng.IHttpPromiseCallbackArg<IResponse<IList<T>>>):IList<T> {
@@ -215,24 +224,31 @@ module app.richstudio {
 
             Object.keys(obj).forEach((property:string)=> {
                 let value = obj[property];
-
-                if (value.type === 'file') {
-                    fd.enctype = 'multipart/form-data';
-                    if (value.files.length > 1) {
-                        for (var i = 0; i < value.files.length; i++) {
-                            fd.append(value.name, value.files[i]);
-                        }
+                if (angular.isUndefined(value)) return;
+                
+                if (angular.isArray(value)) {
+                    if (value[0] instanceof File) {
+                        angular.forEach(value, (file:File)=> {
+                            fd.append(property, file);
+                        });
                     } else {
-                        fd.append(value.name, value.files[0]);
-                    }
-                } else {
-                    if(angular.isObject(value)){
                         fd.append(property, angular.toJson(value));
-                    }else{
-                        fd.append(property, value);
                     }
-                    
+
+                } else {
+                    if (value instanceof File) {
+                        fd.enctype = 'multipart/form-data';
+                        fd.append(property, value);
+                    } else {
+                        if (angular.isObject(value)) {
+                            fd.append(property, angular.toJson(value));
+                        } else {
+                            fd.append(property, value);
+                        }
+
+                    }
                 }
+
             });
 
             return fd;

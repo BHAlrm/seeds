@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h3 class="modal-title">Create gallery</h3>
+</div>
+<div class="modal-body">
+    <form name="dialog.formCreateGallery">
+        <div class="form-group" ng-class="[{'has-error': dialog.formCreateGallery.$invalid && dialog.formCreateGallery.$dirty}]">
+            <lable class="control-label" for="name" aria-label="name">Name</lable>
+            <input type="text" class="form-control" ng-model="dialog.name" name="name" required="true" >
+        </div>
+        <div class="form-group">
+            <lable class="control-label" for="title" aria-label="title">Title</lable>
+            <input type="text" class="form-control" ng-model="dialog.title" name="title">
+        </div>
+        <div class="form-group">
+            <lable class="control-label" for="description" aria-label="description">Description</lable>
+            <textarea class="form-control" ng-model="dialog.description" name="description"></textarea>
+        </div>
+    </form>
+   
+</div>
+<div class="modal-footer text-center">
+    <button class="btn btn-default" type="button" ng-click="dialog.resolve()">Save</button>
+    <button class="btn btn-default" type="button" ng-click="dialog.dismiss()">Cancel</button>
+</div>

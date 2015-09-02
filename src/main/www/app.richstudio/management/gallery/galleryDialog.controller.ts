@@ -9,7 +9,7 @@ module app.richstudio {
 
 
     class GalleryDialogController {
-        static $inject:string[] = ['RichStudioDataService', 'galleryId', 'management'];
+        static $inject:string[] = ['RichStudioDataService', 'request', '$modalInstance'];
 
         private curPage:number;
         private perPage:number;
@@ -21,8 +21,8 @@ module app.richstudio {
 
 
         constructor(private dataService:richstudio.RichStudioDataService,
-                    private galleryId:string,
-                    private management:richstudio.ManagementService) {
+                    private request:IGalleryDialogRequest,
+                    private $modalInstance:ng.ui.bootstrap.IModalServiceInstance) {
             this.activate();
         }
 
@@ -48,53 +48,15 @@ module app.richstudio {
         }
 
         private getGallery() {
-            return this.dataService.getGalleryByID(this.galleryId);
+            return this.dataService.getGalleryByID(this.request.galleryId);
         }
 
-        public clearAll() {
-            this.setSelect(false);
+        
+        public select(image:IImage) {
+            this.$modalInstance.close(image);
         }
 
-        public selectAll() {
-            this.setSelect(true);
-        }
-
-        public showImage(image:IImage) {
-            var viewDialogRequest:IViewDialogRequest = {
-                operatedImage: image,
-                imageList: this.imageList
-            };
-
-            this.management.openViewDialog(viewDialogRequest);
-        }
-
-        public select() {
-            this.showSelected = true;
-        }
-
-        private setSelect(isSelectAll:boolean) {
-            _.each(this.imageList, (image:IImage)=> {
-                image.selected = isSelectAll
-            });
-        }
-
-        private delete() {
-            var deletedImageIds = _.map(this.imageList, (image:richstudio.IImage)=> {
-                if (image.selected) return {image_id: image.image_id};
-            });
-
-            var deleteImageRequest:richstudio.IDeleteImageRequest = {
-                txt_delete_json: angular.toJson(deletedImageIds)
-            };
-
-            return this.dataService.deleteImages(deleteImageRequest).then(() => {
-                this.getImageList()
-                    .then((imageList:richstudio.IImage[])=> {
-                        this.imageList = imageList;
-                    });
-            });
-        }
-
+        
     }
     angular.module('app.richstudio.management').controller('GalleryDialogController', GalleryDialogController);
 }

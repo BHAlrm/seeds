@@ -4,13 +4,13 @@
 module app {
 
     class ProductController {
-        static $inject:string[] = ['management'];
+        static $inject:string[] = ['management', 'notify'];
 
         image:richstudio.IImage;
         cropRect:richstudio.ICropRect;
         rotateDegree:number;
 
-        constructor(private management:richstudio.ManagementService) {
+        constructor(private management:richstudio.ManagementService, private notify:ng.cgNotify.INotifyService) {
             this.activate();
         }
 
@@ -41,9 +41,9 @@ module app {
         
         public submit(){
             this.management.uploadImage(this.image, this.cropRect, this.rotateDegree).then(()=>{
-                //alert('successfully upload image');
             });
         }
+        
 
     }
 

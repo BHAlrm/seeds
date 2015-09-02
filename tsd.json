@@ -31,6 +31,9 @@
     },
     "angular-file-upload/angular-file-upload.d.ts": {
       "commit": "da995655d8f810e5e860d908bf5422ee59ef8ab6"
+    },
+    "angular-notify/angular-notify.d.ts": {
+      "commit": "a213223e1bdf40b280ebf765b42e7ef3da9394dc"
     }
   }
 }

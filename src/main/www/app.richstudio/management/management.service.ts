@@ -19,12 +19,32 @@ module app.richstudio {
     export interface IUploadDialogRequest extends IImageManagementDialogRequest {
         isMultiFileSelection:boolean;
     }
+    
+    export interface ICreateGalleryDialogRequest{
+        userId?: string;
+    }
+    
+    export interface IGalleryDialogRequest {
+        galleryId:string;
+    }
 
     export class ManagementService {
         static $inject:string[] = ['$modal', '$window'];
 
         constructor(private $modal:ng.ui.bootstrap.IModalService,
                     private $window:ng.IWindowService) {
+        }
+        
+        public openCreateGalleryDialog(request:ICreateGalleryDialogRequest):ng.IPromise<any>{
+            var modalOptions = {
+                templateUrl: 'app.richstudio/management/create/create.dialog.template.html',
+                controller: 'CreateGalleryDialogController',
+                controllerAs: 'dialog',
+                resolve: {
+                    request: ()=>request
+                }
+            };
+            return this.$modal.open(modalOptions).result;
         }
 
         public openViewDialog(request:IViewDialogRequest):ng.IPromise<any> {
@@ -94,9 +114,23 @@ module app.richstudio {
 
             return this.$modal.open(modalOptions).result;
         }
+        
+        public openGalleryDialog(request:IGalleryDialogRequest):ng.IPromise<IImage>{
+            var modalOptions = {
+                templateUrl: 'app.richstudio/management/gallery/galleryDialog.template.html',
+                controller: 'GalleryDialogController',
+                controllerAs: 'dialog',
+                size: 'lg',
+                resolve: {
+                    request: ()=> request
+                }
+            };
+
+            return this.$modal.open(modalOptions).result;
+        }
 
 
-        public uploadImage(image:IImage, cropRect:ICropRect, rotateDegrees:number) {
+        public uploadImage(image:IImage, cropRect?:ICropRect, rotateDegrees?:number) {
 
             var modalOptions = {
                 templateUrl: 'app.richstudio/management/upload/uploader.dialog.template.html',
@@ -119,7 +153,7 @@ module app.richstudio {
         }
 
         public uploadMultiImage(images:IImage[], galleryId:string) {
-            var imageFiles:Blob[];
+            var imageFiles:Blob[] = [];
             angular.forEach(images, (image:IImage)=> {
                 imageFiles.push(image.file);
             });

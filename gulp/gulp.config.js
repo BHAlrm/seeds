@@ -24,6 +24,8 @@ module.exports = function () {
             },
             ts: src + '/app/**/*.ts',
             module: src + '/app/app.module.ts',
+            components: src + '/libs/app.components',
+            deps: [src + '/.d/*.d.ts', '!' + src + '/.d/app.d.ts'],
             libs: src + '/libs/**/*.js',
             less: src + '/assets/less/main.less',
             assets: [src + '/assets/**/*', '!' + src + '/assets/less/**/*'],
@@ -48,10 +50,10 @@ module.exports = function () {
          */
         typescript: {
             declarations: {
-                libs: ['typing/tsd.d.ts'],
-                deps: [src + '/app/*.d.ts']
+                app: src + '/.d',
+                libs: ['typing/tsd.d.ts']
             },
-            modules: src + '/**/*.module.ts'
+            modules: src + '/*/*.module.ts'
         },
 
 

@@ -6,7 +6,7 @@ module app.richstudio {
 
         var directive:ng.IDirective = {
             restrict: 'A',
-            templateUrl: 'richstudio/management/crop/imageCrop.template.html',
+            templateUrl: 'app.richstudio/management/crop/imageCrop.template.html',
             scope: {
                 aspectRatio: '=?',
                 displayWidth: '=?',
